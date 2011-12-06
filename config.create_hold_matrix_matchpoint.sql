@@ -24,7 +24,7 @@ CREATE OR REPLACE FUNCTION config.create_hold_matrix_matchpoint(
     pickup_ou               TEXT = NULL,
     item_owning_ou          TEXT = NULL,
     item_circ_ou            TEXT = NULL,
-    usr_grp                 TEXT = NULL,
+    usr_grp                 TEXT = 'Users',
     requestor_grp           TEXT = 'Users',
     circ_modifier           TEXT = NULL,
     marc_type               TEXT = NULL,
