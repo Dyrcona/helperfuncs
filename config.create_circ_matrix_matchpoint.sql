@@ -43,7 +43,8 @@ CREATE OR REPLACE FUNCTION config.create_circ_matrix_matchpoint(
     script_test          TEXT = NULL,
     total_copy_hold_ratio     FLOAT = NULL,
     available_copy_hold_ratio FLOAT = NULL,
-    item_age             INTERVAL = NULL)
+    item_age             INTERVAL = NULL,
+    copy_location        TEXT = NULL)
 RETURNS VOID AS $$
 DECLARE
         org_unit_id INT;
@@ -55,6 +56,7 @@ DECLARE
         copy_circ_lib_id INT = NULL;
         copy_owning_lib_id INT = NULL;
         user_home_ou_id INT = NULL;
+        copy_location_id INT = NULL;
 BEGIN
         -- If we get a bad shortname and this query returns NULL, then
         -- we get an error on the final insert statement.
@@ -111,13 +113,24 @@ BEGIN
            WHERE shortname = user_home_ou;
         END IF;
 
+        IF copy_location IS NOT NULL THEN
+           SELECT INTO copy_location_id acl.id
+           FROM asset.copy_location acl
+           JOIN actor.org_unit_ancestors_distance(org_unit_id) as ad
+           ON acl.owning_lib = ad.id
+           WHERE acl.name = copy_location
+           ORDER BY ad.distance
+           LIMIT 1;
+        END IF;
+
         INSERT INTO config.circ_matrix_matchpoint
         (org_unit, grp, active, circ_modifier, marc_type, marc_form,
          marc_bib_level, marc_vr_format, copy_circ_lib, copy_owning_lib,
          user_home_ou, ref_flag, juvenile_flag, is_renewal, usr_age_lower_bound,
          usr_age_upper_bound, circulate, duration_rule, recurring_fine_rule,
          max_fine_rule, hard_due_date, renewals, grace_period, script_test,
-         total_copy_hold_ratio, available_copy_hold_ratio, item_age)
+         total_copy_hold_ratio, available_copy_hold_ratio, item_age,
+         copy_location)
         VALUES
         (org_unit_id, grp_id, active, circ_modifier, marc_type, marc_form,
          marc_bib_level, marc_vr_format, copy_circ_lib_id, copy_owning_lib_id,
@@ -125,7 +138,7 @@ BEGIN
          usr_age_lower_bound, usr_age_upper_bound, circulate, duration_rule_id,
          recurring_fine_rule_id, max_fine_rule_id, hard_due_date_id, renewals,
          grace_period, script_test, total_copy_hold_ratio,
-         available_copy_hold_ratio, item_age);
+         available_copy_hold_ratio, item_age, copy_location_id);
 
 END;
 $$ LANGUAGE plpgsql;
