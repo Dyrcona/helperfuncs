@@ -116,7 +116,7 @@ BEGIN
         IF copy_location IS NOT NULL THEN
            SELECT INTO copy_location_id acl.id
            FROM asset.copy_location acl
-           JOIN actor.org_unit_ancestors_distance(org_unit_id) as ad
+           JOIN actor.org_unit_ancestors_distance(org_unit_id) AS ad
            ON acl.owning_lib = ad.id
            WHERE acl.name = copy_location
            ORDER BY ad.distance
