@@ -75,42 +75,77 @@ BEGIN
            SELECT INTO duration_rule_id id
            FROM config.rule_circ_duration 
            WHERE name = duration_rule;
+
+           IF duration_rule_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent circ duration rule -> %', duration_rule
+                USING HINT = 'Please check your duration_rule';
+           END IF;
         END IF;
 
         IF recurring_fine_rule IS NOT NULL THEN
            SELECT INTO recurring_fine_rule_id id
            FROM config.rule_recurring_fine
            WHERE name = recurring_fine_rule;
+
+           IF recurring_fine_rule_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent recurring fine rule -> %', recurring_fine_rule
+                USING HINT = 'Please check your recurring_fine_rule';
+           END IF;
         END IF;
 
         IF max_fine_rule IS NOT NULL THEN
            SELECT INTO max_fine_rule_id id
            FROM config.rule_max_fine
            WHERE name = max_fine_rule;
+
+           IF max_fine_rule_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent max fine rule -> %', max_fine_rule
+                USING HINT = 'Please check your max_fine_rule';
+           END IF;
         END IF;
 
         IF hard_due_date IS NOT NULL THEN
            SELECT INTO hard_due_date_id id
            FROM config.hard_due_date
            WHERE name = hard_due_date;
+
+           IF hard_due_date_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent hard due date -> %', hard_due_date
+                USING HINT = 'Please check your hard_due_date';
+           END IF;
         END IF;
 
         IF copy_circ_lib IS NOT NULL THEN
            SELECT INTO copy_circ_lib_id id
            FROM actor.org_unit
            WHERE shortname = copy_circ_lib;
+
+           IF copy_circ_lib_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent location -> %', copy_circ_lib
+                USING HINT = 'Please check your copy_circ_lib';
+           END IF;
         END IF;
 
         IF copy_owning_lib IS NOT NULL THEN
            SELECT INTO copy_owning_lib_id id
            FROM actor.org_unit
            WHERE shortname = copy_owning_lib;
+
+           IF copy_owning_lib_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent location -> %', copy_owning_lib
+                USING HINT = 'Please check your copy_owning_lib';
+           END IF;
         END IF;
 
         IF user_home_ou IS NOT NULL THEN
            SELECT INTO user_home_ou_id id
            FROM actor.org_unit
            WHERE shortname = user_home_ou;
+
+           IF user_home_ou_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent location -> %', user_home_ou
+                USING HINT = 'Please check your user_home_ou';
+           END IF;
         END IF;
 
         IF copy_location IS NOT NULL THEN
@@ -121,6 +156,11 @@ BEGIN
            WHERE acl.name = copy_location
            ORDER BY ad.distance
            LIMIT 1;
+
+           IF copy_location_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent copy location -> %', copy_location
+                USING HINT = 'Please check your copy_location';
+           END IF;
         END IF;
 
         INSERT INTO config.circ_matrix_matchpoint

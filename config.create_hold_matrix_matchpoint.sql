@@ -57,48 +57,88 @@ BEGIN
         SELECT INTO user_home_ou_id id
         FROM actor.org_unit
         WHERE shortname = user_home_ou;
+
+        IF user_home_ou_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent location -> %', user_home_ou
+                USING HINT = 'Please check your user_home_ou';
+        END IF;
     END IF;
 
     IF request_ou IS NOT NULL THEN
         SELECT INTO request_ou_id id
         FROM actor.org_unit
         WHERE shortname = request_ou;
+
+        IF request_ou_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent location -> %', request_ou
+                USING HINT = 'Please check your request_ou';
+        END IF;
     END IF;
 
     IF pickup_ou IS NOT NULL THEN
         SELECT INTO pickup_ou_id id
         FROM actor.org_unit
         WHERE shortname = pickup_ou;
+
+        IF pickup_ou_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent location -> %', pickup_ou
+                USING HINT = 'Please check your pickup_ou';
+        END IF;
     END IF;
 
     IF item_owning_ou IS NOT NULL THEN
         SELECT INTO item_owning_ou_id id
         FROM actor.org_unit
         WHERE shortname = item_owning_ou;
+
+        IF item_owning_ou_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent location -> %', item_owning_ou
+                USING HINT = 'Please check your item_owning_ou';
+        END IF;
     END IF;
 
     IF item_circ_ou IS NOT NULL THEN
         SELECT INTO item_circ_ou_id id
         FROM actor.org_unit
         WHERE shortname = item_circ_ou;
+
+        IF item_circ_ou_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent location -> %', item_circ_ou
+                USING HINT = 'Please check your item_circ_ou';
+        END IF;
     END IF;
 
     IF usr_grp IS NOT NULL THEN
         SELECT INTO usr_grp_id id
         FROM permission.grp_tree
         WHERE name = usr_grp;
+
+        IF usr_grp_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent user group -> %', usr_grp
+                USING HINT = 'Please check your usr_grp';
+        END IF;
     END IF;
 
     IF requestor_grp IS NOT NULL THEN
         SELECT INTO requestor_grp_id id
         FROM permission.grp_tree
         WHERE name = requestor_grp;
+
+        IF requestor_grp_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent user group -> %', requestor_grp
+                USING HINT = 'Please check your requestor_grp';
+        END IF;
     END IF;
 
     IF age_hold_protect_rule IS NOT NULL THEN
         SELECT INTO age_hold_protect_rule_id id
         FROM config.rule_age_hold_protect
         WHERE name = age_hold_protect_rule;
+
+        IF age_hold_protect_rule_id IS NULL THEN
+            RAISE EXCEPTION 'Nonexistent age hold protect rule -> %', age_hold_protect_rule
+                USING HINT = 'Please check your age_hold_protect_rule';
+        END IF;
     END IF;
 
     INSERT INTO config.hold_matrix_matchpoint
