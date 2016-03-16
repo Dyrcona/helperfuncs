@@ -15,6 +15,40 @@
  *
  */
 
+-- If you get a message about needing to drop the function before
+-- creating it anew, then you will need to uncomment the following
+-- block of code.  This is necessary because the function's return
+-- type was changed.
+-- DROP FUNCTION IF EXISTS config.create_circ_matrix_matchpoint(
+--     org                  TEXT,
+--     grp                  TEXT,
+--     active               BOOL,
+--     circ_modifier        TEXT,
+--     marc_type            TEXT,
+--     marc_form            TEXT,
+--     marc_bib_level       TEXT,
+--     marc_vr_format       TEXT,
+--     copy_circ_lib        TEXT,
+--     copy_owning_lib      TEXT,
+--     user_home_ou         TEXT,
+--     ref_flag             BOOL,
+--     juvenile_flag        BOOL,
+--     is_renewal           BOOL,
+--     usr_age_lower_bound  INTERVAL,
+--     usr_age_upper_bound  INTERVAL,
+--     circulate            BOOL,
+--     duration_rule        TEXT,
+--     recurring_fine_rule  TEXT,
+--     max_fine_rule        TEXT,
+--     hard_due_date        TEXT,
+--     renewals             INT,
+--     grace_period         INTERVAL,
+--     script_test          TEXT,
+--     total_copy_hold_ratio     FLOAT,
+--     available_copy_hold_ratio FLOAT,
+--     item_age             INTERVAL,
+--     copy_location        TEXT);
+
 -- A helper function to be used to create matchpoints.
 CREATE OR REPLACE FUNCTION config.create_circ_matrix_matchpoint(
     org                  TEXT,
@@ -45,7 +79,7 @@ CREATE OR REPLACE FUNCTION config.create_circ_matrix_matchpoint(
     available_copy_hold_ratio FLOAT = NULL,
     item_age             INTERVAL = NULL,
     copy_location        TEXT = NULL)
-RETURNS VOID AS $$
+RETURNS INT AS $$
 DECLARE
         org_unit_id INT;
         grp_id INT;
@@ -57,6 +91,7 @@ DECLARE
         copy_owning_lib_id INT = NULL;
         user_home_ou_id INT = NULL;
         copy_location_id INT = NULL;
+        ccmm_id INT = NULL;
 BEGIN
         -- If we get a bad shortname and this query returns NULL, then
         -- we get an error on the final insert statement.
@@ -178,7 +213,10 @@ BEGIN
          usr_age_lower_bound, usr_age_upper_bound, circulate, duration_rule_id,
          recurring_fine_rule_id, max_fine_rule_id, hard_due_date_id, renewals,
          grace_period, script_test, total_copy_hold_ratio,
-         available_copy_hold_ratio, item_age, copy_location_id);
+         available_copy_hold_ratio, item_age, copy_location_id)
+         RETURNING id into ccmm_id;
+
+         RETURN ccmm_id;
 
 END;
 $$ LANGUAGE plpgsql;

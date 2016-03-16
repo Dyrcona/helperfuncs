@@ -15,6 +15,36 @@
  *
  */
 
+-- If you get a message about needing to drop the function before
+-- creating it anew, then you will need to uncomment the following
+-- block of code.  This is necessary because the function's return
+-- type was changed.
+-- DROP FUNCTION IF EXISTS config.create_hold_matrix_matchpoint(
+--     active                  BOOL,
+--     strict_ou_match         BOOL,
+--     user_home_ou            TEXT,
+--     request_ou              TEXT,
+--     pickup_ou               TEXT,
+--     item_owning_ou          TEXT,
+--     item_circ_ou            TEXT,
+--     usr_grp                 TEXT,
+--     requestor_grp           TEXT,
+--     circ_modifier           TEXT,
+--     marc_type               TEXT,
+--     marc_form               TEXT,
+--     marc_bib_level          TEXT,
+--     marc_vr_format          TEXT,
+--     juvenile_flag           BOOL,
+--     ref_flag                BOOL,
+--     holdable                BOOL,
+--     distance_is_from_owner  BOOL,
+--     transit_range           INT,
+--     max_holds               INT,
+--     include_frozen_holds    BOOL,
+--     stop_blocked_user       BOOL,
+--     age_hold_protect_rule   TEXT,
+--     item_age                INTERVAL);
+
 -- A helper function to make config.hold_matrix_matchpoint entries.
 CREATE OR REPLACE FUNCTION config.create_hold_matrix_matchpoint(
     active                  BOOL = TRUE,
@@ -41,7 +71,7 @@ CREATE OR REPLACE FUNCTION config.create_hold_matrix_matchpoint(
     stop_blocked_user       BOOL = FALSE,
     age_hold_protect_rule   TEXT = NULL,
     item_age                INTERVAL = NULL)
-RETURNS VOID AS $$
+RETURNS INT AS $$
 DECLARE
     user_home_ou_id            INT = NULL;
     request_ou_id              INT = NULL;
@@ -51,6 +81,7 @@ DECLARE
     usr_grp_id                 INT = NULL;
     requestor_grp_id           INT = NULL;
     age_hold_protect_rule_id INT = NULL;
+    chmm_id INT = NULL;
 BEGIN
 
     IF user_home_ou IS NOT NULL THEN
@@ -153,7 +184,10 @@ BEGIN
      circ_modifier, marc_type, marc_form, marc_bib_level, marc_vr_format,
      juvenile_flag, ref_flag, holdable, distance_is_from_owner, transit_range,
      max_holds, include_frozen_holds, stop_blocked_user,
-     age_hold_protect_rule_id, item_age);
+     age_hold_protect_rule_id, item_age)
+     RETURNING id into chmm_id;
+
+     RETURN chmm_id;
 
 END;
 $$ LANGUAGE plpgsql;
